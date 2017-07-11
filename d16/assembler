@@ -1,0 +1,80 @@
+#!/usr/bin/python3
+# Made by XYZatesz, on 26-06-2017 (and the morning afterwards :P)
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("file", help="file to compile to machine code")
+args = parser.parse_args()
+
+
+def get_command(keyword):
+    key_dict = {'NOOP': 0, 'AND': 1, 'OR': 2, 'XOR': 3, 'NOT': 4, 'SHIFTL': 5,
+                'SHIFTR': 6, 'ADD': 7, 'SUB': 8, 'MUL': 9, 'DIV': 10, 'OUTPUT': 16,
+                'COPY': 19, 'JUMP': 25, 'SETREG': 27, 'JUMPEQ': 28, 'JUMPGT': 29}
+    value = key_dict.get(keyword)
+    return value
+
+
+# Place is 0 for x, 1 for y, and 2 for z
+def get_register(register, place, line):
+    if not register.startswith('$R'): raise ValueError("Register '" + register + "' in line " +
+                                                       line + " is not correctly specified")
+    register = int(register.strip('$R'))
+    place_dict = {0: 256, 1: 32, 2: 1}
+    return register * place_dict.get(place)
+
+
+def get_jump(jump, line):
+    if not jump.startswith('L'): raise ValueError("Jump line '" + jump + "' in line " +
+                                                  line + " is not correctly specified")
+    return int(jump.strip('L'))
+
+
+def to_hex(integer):
+    return str(hex(int(integer))).replace('0x','').zfill(4) + " "
+
+output = ""
+
+with open(args.file, 'r') as file:
+    for line in file:
+        if line.startswith(('#',';')): continue
+        line = line.rstrip('\n')
+        words = line.split(' ')
+        command_num = get_command(words[0])
+        byte = command_num * 2048
+        if command_num == 0:
+            output += "0000 "
+            continue
+        if (0 < command_num < 4) | (6 < command_num < 11):
+            byte += get_register(words[1], 1, line) + get_register(words[2], 2, line)
+            byte += get_register(words[4], 0, line)
+            output += to_hex(byte)
+            continue
+        if 4 < command_num < 7:
+            byte += get_register(words[1], 1, line) + get_register(words[3], 2, line)
+            byte += get_register(words[5], 0, line)
+            output += to_hex(byte)
+            continue
+        if (4 == command_num) | (19 == command_num):
+            byte += get_register(words[1], 1, line) + get_register(words[3], 0, line)
+            output += to_hex(byte)
+            continue
+        if 16 == command_num:
+            byte += get_register(words[1], 1, line)
+            output += to_hex(byte)
+            continue
+        if 25 == command_num:
+            output += to_hex(byte)
+            output += to_hex(get_jump(words[2], line))
+            continue
+        if 27 == command_num:
+            byte += get_register(words[1], 0, line)
+            output += to_hex(byte) + to_hex(eval(words[3]))
+            continue
+        if 27 < command_num < 30:
+            byte += get_register(words[1], 1, line) + get_register(words[2], 2, line)
+            output += to_hex(byte) + to_hex(get_jump(words[4], line))
+            continue
+
+print(output)

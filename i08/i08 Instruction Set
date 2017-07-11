@@ -1,0 +1,22 @@
+00 00 Rd Rs -> AND -> Rd = Rd AND Rs 
+00 01 Rd Rs -> OR  -> Rd = Rd OR Rs
+00 10 Rd Rs -> ADD -> Rd = Rd + Rs
+00 11 Rd Rs -> SUB -> Rd = Rd - Rs
+01 10 Rd Rs -> SET -> Rd = Rs
+01 11 00 00 -> NOP -> Do nothing
+10 00 Rd 00 -> JUMPIF0 -> PC = IMMED if Rd == 0
+10 01 Rd 00 -> JUMPNOT0 -> PC = IMMED if Rd != 0
+11 00 Rd 00 -> SETIMMED -> Rd = immed
+11 11 00 00 -> JUMP -> PC = immed
+
+Example code:
+AND $R0 $R2
+OR $R0 $R2
+ADD $R0 $R2
+SUB $R0 $R2
+SET $R0 $R2
+NOP
+JUMPIF0 $R3 L255
+JUMPNOT0 $R3 L3
+SETIMMED $R1 240
+JUMP L44

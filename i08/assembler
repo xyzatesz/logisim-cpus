@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("file", help="file to compile to machine code")
+args = parser.parse_args()
+
+
+def get_decimal_command(keyword):
+    key_dict = {'AND': 0, 'OR': 16, 'ADD': 32, 'SUB': 48, 'SET': 96,
+                'NOP': 112, 'JUMPIF0': 128, 'JUMPNOT0': 144, 'SETIMMED': 192, 'JUMP': 240}
+    return key_dict.get(keyword)
+
+
+def get_decimal_register(place, keyword):
+    key_dict = {'$R0': 0, '$R1': 1, '$R2': 2, '$R3': 3}
+    return place * key_dict.get(keyword)
+
+
+output_string = ""
+
+with open(args.file, 'r') as file:
+    for line in file:
+        line = line.rstrip('\n')
+        words = line.split(' ')
+        command = get_decimal_command(words[0])
+        if command < 112:                                       # These require two $RX-es
+            command += get_decimal_register(4, words[1])
+            command += get_decimal_register(1, words[2])
+            output_string += str(hex(command)) + " "
+            continue
+        if command == 112:                                      # This requires no more data
+            output_string += str(hex(112)) + " "
+            continue
+        if (command > 112) & (command < 240):                       # These require one $RX, and an integer
+            command += get_decimal_register(4, words[1])
+            output_string += str(hex(command)) + " "
+            second_byte = int(words[2].replace('L', ''))
+            output_string += str(hex(second_byte)) + " "
+            continue
+        if command == 240:                                      # This only requires an integer
+            output_string += str(hex(240)) + " "
+            byte = int(words[1].replace('L', ''))
+            output_string += str(hex(byte)) + " "
+            continue
+
+code_array = output_string.split(' ')
+output_string = ""
+for item in code_array:
+    output_string += item.replace("0x", '').zfill(2) + " "
+
+print(output_string)

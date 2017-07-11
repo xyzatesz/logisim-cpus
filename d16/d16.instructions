@@ -1,0 +1,38 @@
+NOOP   - 00000000 00000000 - No Operation
+AND    - 00001xxx yyy00zzz - $Rx = $Ry AND $Rz
+OR     - 00010xxx yyy00zzz - $Rx = $Ry OR $Rz
+XOR    - 00011xxx yyy00zzz - $Rx = $Ry XOR $Rz
+NOT    - 00100xxx yyy00000 - $Rx = NOT $Ry
+SHIFTL - 00101xxx yyy00zzz - $Rx = $Ry << $Rz
+SHIFTR - 00110xxx yyy00zzz - $Rx = $Ry >> $Rz
+ADD    - 00111xxx yyy00zzz - $Rx = $Ry + $Rz
+SUB    - 01000xxx yyy00zzz - $Rx = $Ry - $Rz
+MUL    - 01001xxx yyy00zzz - $Rx = $Ry * $Rz
+DIV    - 01010xxx yyy00zzz - $Rx = $Ry / $Rz
+OUTPUT - 10000000 yyy00000 - Output $Ry
+COPY   - 10011xxx yyy00yyy - $Rx = $Ry
+JUMP   - 11001000 00000000 - (2-part) Jump to line $immed
+SETREG - 11011xxx 00000000 - (2-part) $Rx = $immed
+JUMPEQ - 11100000 yyy00zzz - (2-part) Jump to line $immed if $Ry == $Rz
+JUMPGT - 11101000 yyy00zzz - (2-part) Jump to line $immed if $Ry > $Rz
+
+Valid commands are like the following:
+NOOP
+AND $R4 $R5 to $R0
+OR $R2 $R4 to $R0
+XOR $R3 $R1 to $R0
+NOT $R2 to $R0
+SHIFTL $R1 by $R4 to $R0
+SHIFTR $R3 by $R3 to $R0
+ADD $R5 $R5 to $R3
+SUB $R5 $R5 to $R3
+MUL $R5 $R5 to $R3
+DIV $R5 $R4 to $R2
+OUTPUT $R3
+COPY $R3 to $R2
+JUMP to L32156
+SETREG $R3 to 24562
+JUMPEQ $R3 $R2 to L3
+JUMPGT $R3 $R2 to L5
+
+~~ XYZatesz ~~
