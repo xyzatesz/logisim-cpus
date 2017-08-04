@@ -1,0 +1,15 @@
+# Should be used with the m24 TTY setup
+
+print ord('H')
+print ord('e')
+print ord('l')
+print ord('l')
+print ord('o')
+print 32
+print ord('w')
+print ord('o')
+print ord('r')
+print ord('l')
+print ord('d')
+
+# 44000048 44000065 4400006c 4400006c 4400006f 44000020 44000077 4400006f 44000072 4400006c 44000064

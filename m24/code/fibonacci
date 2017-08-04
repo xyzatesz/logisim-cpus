@@ -1,0 +1,15 @@
+# Why is every logisim cpu tested with Fibonacci?
+# $0 holds the nth, $1 the n-1st, and $2 the n-2nd element
+# $3 is used to preserve the previous value of $0
+
+$0 = 1
+$1 = 1
+$2 = 0
+$0 = $1 + $2
+copy $0 to $3
+print $0
+copy $1 to $2
+copy $3 to $1
+jump to line 4
+
+# 4c000001 4d000001 4e000000 1c600000 4b000000 40000000 4a400000 49c00000 50000003

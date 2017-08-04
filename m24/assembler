@@ -1,0 +1,103 @@
+#!/usr/bin/python3
+# Made by XYZatesz, on 26-07-2017
+
+# Not a beautiful code. At all. But it works and handles
+# way more sophisticated syntax than my previous d16 assembler
+
+# TL;DR: The 32-bit operation code is hardcoded in decimal, and
+# I convert it to hex at the end of every operation.
+
+# This code is meant to be used, not read and understood
+# I warned you
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("file", help="File to assemble")
+args = parser.parse_args()
+
+# Please don't be mad... It works after all...
+alu_key_dict = {
+    '&': 67108864,
+    '|': 134217728,
+    '^': 201326592,
+    '<<': 335544320,
+    '>>': 402653184,
+    '+': 469762048,
+    '-': 536870912,
+    '*': 603979776,
+    '/': 671088640,
+    '%': 738197504
+}
+
+
+# Place is 0 for x, 1 for y, and 2 for z
+def get_register(register, place, line):
+    if not register.startswith('$'):
+        raise ValueError("Register '" + register + "' in line " + line + " is not correctly specified")
+    register = int(register.strip('$'))
+    if register > 3:
+        raise ValueError("Register '$" + str(register) + "' in line " + line + " points to a nonexistent register")
+    place_dict = {0: 16777216, 1: 4194304, 2: 1048576}
+    return register * place_dict.get(place)
+
+
+# Convert decimal to hexadecimal
+def to_hex(integer):
+    return " " + str(hex(int(integer))).replace('0x', '').zfill(8)
+
+output = ""
+
+# I use quadbyte, because 'word' would be ambiguous, and I know no other way to say '32 bits'
+with open(args.file, 'r') as file:
+    for line in file:
+        if line.startswith(('#', ';', '\n', '\r')):
+            continue
+        line = line.rstrip('\n')
+        line = line.rstrip('\r')        # For windows users. I think...
+        words = line.split(' ')
+        if words[0] == 'wait':
+            output += " 00000000"
+            continue
+        if words[0].startswith('$'):    # Deals with the ALU ops completely
+            if words[2] == '!':
+                quadbyte = 268435456
+                quadbyte += get_register(words[0], 0, line) + get_register(words[3], 1, line)
+            elif not words[2].startswith('$'):  # This deals with the 'set reg to value' command
+                quadbyte = 1275068416 + get_register(words[0], 0, line) + int(eval(words[2]))
+            else:
+                quadbyte = alu_key_dict.get(words[3])
+                quadbyte += get_register(words[0], 0, line) + get_register(words[2], 1, line) + get_register(words[4], 2, line)
+            output += to_hex(quadbyte)
+            continue
+        if words[0] == 'print':
+            if words[1].startswith('$'):
+                quadbyte = 1073741824 + get_register(words[1], 1, line)
+            else:
+                quadbyte = 1140850688 + int(eval(words[1]))
+            output += to_hex(quadbyte)
+            continue
+        if words[0] == 'copy':
+            quadbyte = 1207959552 + get_register(words[1], 1, line) + get_register(words[3], 0, line)
+            output += to_hex(quadbyte)
+            continue
+        if words[0] == 'jump':
+            if len(words) == 4:
+                quadbyte = 1342177280 + int(words[3]) - 1
+            elif words[6] == '=':
+                quadbyte = 1409286144 + get_register(words[5], 1, line) + get_register(words[7], 2, line) + int(words[3]) - 1
+            else:
+                quadbyte = 1476395008 + get_register(words[5], 1, line) + get_register(words[7], 2, line) + int(words[3]) - 1
+            output += to_hex(quadbyte)
+            continue
+        if words[0] == 'ram':
+            if words[1] == 'write':
+                quadbyte = 1543503872 + get_register(words[2], 1, line) + int(words[5])
+            elif words[1] == 'read':
+                quadbyte = 1610612736 + get_register(words[5], 0, line) + int(words[3])
+            else:
+                quadbyte = 1677721600 + int(words[3])
+            output += to_hex(quadbyte)
+            continue
+
+print(output)

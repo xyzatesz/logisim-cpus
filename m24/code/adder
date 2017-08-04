@@ -1,0 +1,9 @@
+; Test to see if comments and jumps work together
+
+$0 = 0
+$1 = 1
+$0 = $0 + $1
+print $0
+jump to line 3
+
+; 4c000000 4d000001 1c100000 40000000 50000002

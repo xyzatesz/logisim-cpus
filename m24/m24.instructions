@@ -1,0 +1,29 @@
+NOOP:		00000000 00000000 00000000 00000000 - wait
+AND:		000001xx yyzz0000 00000000 00000000 - $x = $y & $z
+OR:		000010xx yyzz0000 00000000 00000000 - $x = $y | $z
+XOR:		000011xx yyzz0000 00000000 00000000 - $x = $y ^ $z
+NOT:		000100xx yy000000 00000000 00000000 - $x = ! $y
+LSHIFT:		000101xx yyzz0000 00000000 00000000 - $x = $y << $z
+RSHIFT:		000110xx yyzz0000 00000000 00000000 - $x = $y >> $z
+ADD:		000111xx yyzz0000 00000000 00000000 - $x = $y + $z
+SUB:		001000xx yyzz0000 00000000 00000000 - $x = $y - $z
+MUL:		001001xx yyzz0000 00000000 00000000 - $x = $y * $z
+DIV:		001010xx yyzz0000 00000000 00000000 - $x = $y / $z
+MOD:		001011xx yyzz0000 00000000 00000000 - $x = $y % $z
+OUTR:		01000000 yy000000 00000000 00000000 - print $y
+OUTV:		01000100 vvvvvvvv vvvvvvvv vvvvvvvv - print v
+COPY:		010010xx yy000000 00000000 00000000 - copy $y to $x
+SETR:		010011xx vvvvvvvv vvvvvvvv vvvvvvvv - $x = v
+JUMP:		01010000 0000llll llllllll llllllll - jump to line l
+JUEQ:		01010100 yyzzllll llllllll llllllll - jump to line l if $y = $z
+JUGT:		01011000 yyzzllll llllllll llllllll - jump to line l if $y > $z
+RAMW:		01011100 yy000000 llllllll llllllll - ram write $y to address l
+RAMR:		011000xx 00000000 llllllll llllllll - ram read address l to $x
+RAMO:		01100100 00000000 llllllll llllllll - ram output address l
+
+Notes: At SETR and OUTV, python code is also accepted, such as ord('i')
+       The line numbers are the ones you see in your text editor:
+       Lines start with 1, but comments & empty lines DON'T count.
+       RAM addresses, however, are different, they start with 0 :P
+
+~~ XYZatesz ~~

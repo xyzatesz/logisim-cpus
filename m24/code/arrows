@@ -1,0 +1,11 @@
+# Should be used with the m24 LEDs setup
+
+print 9587090
+wait
+print 4793417
+wait
+print 2396708
+jump to line 1
+
+# 44924992 00000000 44492449 00000000 44249224 50000000
+

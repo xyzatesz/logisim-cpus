@@ -1,0 +1,41 @@
+The CPU is 24-bit mostly, meaning that the register size is 24 bits.
+However, in order to keep every instruction in one word, the data in
+bit width is 32 bits, and the ROM address bit width is 20 bits.
+There are 4 general purpose registers, for the word width is limiting,
+but the m24 also includes a RAM (16 bit, but only to make it realistic - 
+the RAM could also have a 20 bit address width, but 3MB RAM for 3MB storage?
+Who heard about such thing?), which is new in my CPU lineup.
+INSTR: OPCODE | XX | YY | ZZ | -whatever-
+       OPCODE | XX | -value-
+       OPCODE | 00 | YY | ZZ | -address-
+The instruction code contains a 6-bit operation code, and depending on
+the instruction (only the most common are listed):
+    - A write register, two read registers, and whatever (used in the ALU ops).
+    - A 2-bit input register and 24 bits of data (used in set reg value).
+    - 2 empty bits, two 2-bit registers and 20 bits of data (used in jumps).
+
+~~~~~
+
+Now for the logic part: The control unit is going to be a ROM, with a word width of
+?, soon to be figured out.
+
+Switches needed to function:
+ - Write Reg		(2b)
+ - Read1 Reg		(2b)
+ - Read2 Reg		(2b)
+ - Alu OP		(4b)	(These don't need to be controlled from the ROM)
+ - Reg Write Enabled	(1b)
+ - Reg Input		(2b) [from the ALU, from OP, from RAM, from $Ry]
+ - ROM Addresser Input  (2b) [from RAI+1, from OP, +2 because of conditional jumps]
+ - Out Switch		(2b) [none, from $Ry, from IMMED, from RAM]
+ - RAM Write		(1b)
+
+This means a word width of 8 bits.
+The word is built up like this:
+	EnableRegWrite (1) | RegInput (2) | ROMAddr (2) | OutSwitch (2) | RAMWrite (1)
+
+Microcode:
+
+00 80 80 80 80 80 80 80 80 80 80 80 00 00 00 00 02 04 E0 A0 08 10 18 01 C0 06
+
+~~ XYZatesz ~~
